@@ -1,12 +1,3 @@
-# Sinmoji local keyword scorer
-# Format:
-# [axis]
-# one keyword or phrase per line
-#
-# Keep this file broad but not too generic. Prefer phrases that reveal user intent, emotion, desire, conflict, comparison, appetite, avoidance, ambition, or attraction.
-# Runtime evaluate uses keyword_weight from config/sinmoji.json to mix these local scores with LLM scores.
-# Axis order follows the common seven deadly sins order: pride, envy, wrath, sloth, greed, gluttony, lust.
-
 [pride]
 傲慢
 自大
@@ -34,9 +25,7 @@
 吊打
 碾压
 压制
-赢
 赢麻了
-胜利
 证明自己
 证明给他们看
 我要赢
@@ -45,8 +34,6 @@
 最佳
 最优
 最优解
-最佳实践
-最佳方案
 天花板
 第一
 冠军
@@ -62,15 +49,9 @@ masterpiece
 top tier
 pro level
 expert level
-best practice
-best solution
-clean code
-架构师
 架构感
 架构漂亮
 架构优雅
-工程化
-工程能力
 技术品味
 代码品味
 代码审美
@@ -80,13 +61,8 @@ clean code
 漂亮代码
 代码漂亮
 代码干净
-代码质量
-可维护
-可扩展
 高级
 高级感
-专业
-专业感
 大厂范
 大厂风
 大厂味
@@ -153,14 +129,10 @@ clean code
 朋友比我
 隔壁组
 隔壁团队
-竞品
 竞品更火
 竞品比我好
 竞品起飞
 竞品爆火
-对标
-benchmark
-peer comparison
 他们凭什么
 他怎么就
 她怎么就
@@ -178,8 +150,6 @@ offer比我好
 别人升职
 别人加薪
 别人融资
-拿融资
-融资了
 估值比我高
 用户比我多
 粉丝比我多
@@ -198,16 +168,6 @@ stars
 榜一
 霸榜
 热榜
-出圈
-爆火
-涨粉
-涨薪
-升职
-拿奖
-获奖
-被夸
-被看见
-被推荐
 被老板夸
 别人项目
 他的项目
@@ -288,17 +248,12 @@ more stars than me
 坨屎
 屎山
 史山
-技术债
 依赖地狱
 版本地狱
 炸库
 炸了
-崩了
 又崩了
-挂了
 又挂了
-crash
-crashed
 broken api
 bad api
 this is garbage
@@ -306,18 +261,14 @@ who wrote this
 spaghetti code
 legacy mess
 dependency hell
-报错
 报错一堆
 一堆报错
 全是错
 莫名报错
 离谱报错
-bug
 大坑
-坑
 坑爹
 巨坑
-踩坑
 被坑
 谁写的
 谁设计的
@@ -369,42 +320,100 @@ furious
 懒惰
 懒
 懒得
-懒得写
-懒得改
+懒得优化
+懒得重构
+懒得维护
+懒得学习
+懒得理解
+懒得研究
+懒得改进
+懒得打磨
+懒得写测试
 懒得测
-懒得调
-懒得看
-懒得想
-懒得弄
-懒得配置
-不想
-不想动
-不想动脑
-不想思考
+懒得看文档
+懒得处理边界
+懒得管
+不想优化
+不想重构
+不想维护
 不想学习
-不想上班
-不想写
-不想改
-不想测
-不想调
-不想配
-不想看文档
-脑子不转
-低能量
-没动力
-提不起劲
-困了
-好困
-累了
-好累
-太累
-困死
-累死
-休息
-休息一下
-躺平
+不想理解
+不想研究
+不想改进
+不想打磨
+不想写测试
+不想处理边界
+不想管
+没必要优化
+没必要重构
+没必要维护
+没必要测试
+没必要那么优雅
+没必要那么规范
+没必要那么复杂
+不用优化
+不用重构
+不用维护
+不用测试
+不用太优雅
+不用太规范
+不用管边界
+别优化
+别重构
+别讲究
+别太讲究
+别管质量
+别管维护性
+别管扩展性
+别管优雅
+别管最佳实践
+不追求优雅
+不追求优化
+不追求质量
+不追求维护性
+不追求扩展性
+不追求最佳实践
+不需要优雅
+不需要优化
+不需要质量
+不需要维护性
+不需要扩展性
+不需要最佳实践
+无所谓
+随便
+凑合
+能跑就行
+能用就行
+差不多就行
+差不多得了
+先这样
+先凑合
+先能跑
+先能用
+简单粗暴
+越简单越好
+别太认真
+不用太认真
+低标准
+低要求
+低质量也行
+粗糙点也行
+烂点也行
+丑点也行
+乱点也行
+快糙猛
+临时方案
+临时补丁
+一次性脚本
+一次性方案
+脏一点
+hack一下
+糊一下
+糊弄一下
+先糊上
 摆烂
 开摆
+躺平
 摸鱼
 划水
 逃避
@@ -415,18 +424,7 @@ furious
 明天再说
 下次再说
 以后再说
-算了
-无所谓
-随便
-凑合
-差不多得了
-容易满足
-怯懦
 怕麻烦
-怕出错
-无责任心
-不负责
-浪费时间
 太麻烦
 麻烦
 麻烦死
@@ -437,62 +435,41 @@ furious
 少解释
 长话短说
 直接说结论
-直接给我
+别废话
 别废话直接
-一步到位
-一键
-一键搞定
-一键生成
-一键部署
-一键安装
-一键运行
-一键修复
-开箱即用
-复制粘贴
-复制即用
-照抄
-抄作业
-给现成
-现成的
-有没有现成
-有没有模板
-模板
-脚手架
-scaffold
-boilerplate
-starter
-懒人版
-懒人包
 省事
 最省事
 省脑
 省手
 省步骤
-自动
-自动化
-全自动
-自动生成
-自动补全
-自动写
-自动改
-自动修
-自动部署
-自动跑
-托管
-你全包
-帮我搞定
-帮我写完
-帮我改完
-帮我生成
-帮我整理
-帮我总结
-do it for me
-one click
-just generate
-ready made
-too tired
-copy paste
-auto generate
+good enough
+just enough
+minimum viable
+bare minimum
+quick and dirty
+ship it
+whatever
+no polish
+no optimization
+no refactor
+no tests
+skip tests
+skip optimization
+skip refactor
+don't optimize
+don't refactor
+don't care about quality
+don't care about maintainability
+low quality is fine
+rough is fine
+hack it
+just make it run
+just make it work
+not elegant
+no best practices
+too much effort
+too much work
+too tired to improve
 no thinking
 
 [greed]
@@ -561,25 +538,17 @@ side project
 降本
 降本增效
 提效
-效率
-提升效率
 人效
 省钱
-省时间
 节省成本
-节省时间
-低成本
 白嫖
 薅羊毛
 优惠
 优惠券
-便宜
 捡漏
 套利
 复利
 投资
-预算
-成本
 控制成本
 增长
 增长飞轮
@@ -601,19 +570,15 @@ growth hacking
 漏斗
 funnel
 规模化
-批量
 批量生成
-批量处理
 批量生产
 自动化赚钱
 印钞机
 赚钱机器
-资源
 抢资源
 占资源
 卡位
 占坑
-机会
 窗口期
 红利
 流量红利
@@ -638,9 +603,6 @@ ROI最大化
 上瘾
 成瘾
 享乐
-爽
-爽感
-过瘾
 太爽
 无节制
 控制不住
@@ -682,10 +644,6 @@ CPU吃满
 塞满
 填满
 全部塞满
-全量
-全都要
-加量
-加量版
 拉满
 堆功能
 功能堆满
@@ -719,7 +677,6 @@ prompt太长
 汉堡
 披萨
 奶茶
-咖啡
 啤酒
 酒
 可乐
@@ -746,6 +703,33 @@ eat too much
 overeating
 so hungry
 want coffee
+
+全部细节
+所有细节
+所有例子
+所有案例
+所有边界情况
+所有边界条件
+尽可能详细
+越详细越好
+细节拉满
+信息量拉满
+爆量版
+完整大礼包
+全部塞进来
+给我全部
+give me everything
+max detail
+maximum detail
+fully loaded
+loaded version
+all examples
+all edge cases
+all details
+as much detail as possible
+pack everything in
+all-in version
+resource feast
 
 [lust]
 色欲

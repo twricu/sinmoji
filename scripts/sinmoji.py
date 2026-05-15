@@ -12,7 +12,6 @@ from typing import Any
 
 AXIS_ORDER = ("pride", "envy", "wrath", "sloth", "greed", "gluttony", "lust")
 BAR_WIDTH = 20
-DEFAULT_THRESHOLDS = {"level_1": 10, "level_2": 20, "level_3": 40, "level_4": 100}
 DEFAULT_PROFILE_JSON = r"""
 {
   "created_at": "__NOW__",
@@ -35,72 +34,60 @@ DEFAULT_PROFILE_JSON = r"""
 """
 
 
-# 获取当前 skill 项目的根目录。
+# Resolve the current skill project root.
 def skill_root() -> Path:
     """Return the skill root directory."""
     return Path(__file__).resolve().parents[1]
 
 
-# 获取用户配置文件路径。
+# Resolve the user-facing config file path.
 def config_path() -> Path:
     """Return the user-facing JSON config path."""
     return skill_root() / "config" / "sinmoji.json"
 
 
-# 获取用户维护的关键词文件路径。
+# Resolve the user-maintained keyword file path.
 def keywords_path() -> Path:
     """Return the user-maintained keyword file path."""
     return skill_root() / "config" / "keywords.txt"
 
 
-# 获取当前用户画像状态文件路径。
+# Resolve the current profile state path.
 def profile_path() -> Path:
     """Return the installed skill profile state path."""
     return skill_root() / "state" / "profile.json"
 
 
-# 获取画像变更快照日志文件路径。
+# Resolve the profile snapshot log path.
 def events_path() -> Path:
     """Return the installed skill profile change log path."""
     return skill_root() / "state" / "profile_snapshots.jsonl"
 
 
-# 生成当前本地时间戳。
+# Build the current local timestamp.
 def now_iso() -> str:
     """Return the current local timestamp."""
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
-# 读取 JSON 对象，文件不存在或内容异常时返回默认值。
-def read_json(path: Path, default: dict[str, Any]) -> dict[str, Any]:
-    """Read a JSON object, falling back to default when the file is absent or invalid."""
-    data, _ = read_json_with_fallback(path, default)
+# Read JSON and expose config or state errors directly.
+def read_json(path: Path) -> dict[str, Any]:
+    """Read a required JSON object."""
+    with path.open("r", encoding="utf-8") as file:
+        data = json.load(file)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object")
     return data
 
 
-# 读取 JSON 对象，同时返回是否使用了默认值。
-def read_json_with_fallback(path: Path, default: dict[str, Any]) -> tuple[dict[str, Any], bool]:
-    """Read JSON and report whether fallback data was used."""
-    if not path.exists() or path.stat().st_size == 0:
-        return dict(default), True
-    try:
-        with path.open("r", encoding="utf-8") as file:
-            data = json.load(file)
-    except (OSError, json.JSONDecodeError):
-        return dict(default), True
-    if not isinstance(data, dict):
-        return dict(default), True
-    return data, False
-
-
-# 写入格式化 JSON，并自动创建父目录。
+# Write formatted JSON and create the parent directory.
 def write_json(path: Path, data: dict[str, Any]) -> None:
     """Write pretty JSON and create the parent directory when needed."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-# 将配置或命令行数字限制在安全范围内。
+# Clamp config or CLI numbers into a safe range.
 def clamp_number(value: Any, lower: float, upper: float, fallback: float) -> float:
     """Clamp a numeric config or CLI value into a safe range."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -108,66 +95,35 @@ def clamp_number(value: Any, lower: float, upper: float, fallback: float) -> flo
     return max(lower, min(upper, float(value)))
 
 
-# 加载并规范化运行时配置。
+# Load runtime config.
 def load_config() -> dict[str, Any]:
-    """Load config/sinmoji.json and fill only the defaults needed at runtime."""
-    config = read_json(config_path(), {})
-
-    # Scoring controls how one-turn LLM and keyword scores become cumulative profile deltas.
-    scoring = config.setdefault("scoring", {})
-    scoring["llm_score_max"] = clamp_number(scoring.get("llm_score_max", 5), 1, 10, 5)
-    scoring["score_multiplier"] = clamp_number(scoring.get("score_multiplier", 3), 0, 100, 3)
-    scoring["keyword_weight"] = clamp_number(scoring.get("keyword_weight", 0.2), 0, 1, 0.2)
-    scoring["decay_factor"] = clamp_number(scoring.get("decay_factor", 1), 0, 1, 1)
-    scoring["secondary_axis_ratio"] = clamp_number(scoring.get("secondary_axis_ratio", 0.3), 0, 1, 0.3)
-
-    # Axis weights let each dimension grow faster or slower while keeping 1 as neutral.
-    raw_axis_weights = scoring.get("axis_weights") if isinstance(scoring.get("axis_weights"), dict) else {}
-    scoring["axis_weights"] = {axis: clamp_number(raw_axis_weights.get(axis, 1), 0, 100, 1) for axis in AXIS_ORDER}
-
-    # Level thresholds map unbounded cumulative scores to Lv0-Lv4.
-    thresholds = scoring.get("level_thresholds") if isinstance(scoring.get("level_thresholds"), dict) else {}
-    scoring["level_thresholds"] = {
-        "level_1": clamp_number(thresholds.get("level_1", 10), 0, 1_000_000, 10),
-        "level_2": clamp_number(thresholds.get("level_2", 20), 0, 1_000_000, 20),
-        "level_3": clamp_number(thresholds.get("level_3", 40), 0, 1_000_000, 40),
-        "level_4": clamp_number(thresholds.get("level_4", 100), 0, 1_000_000, 100),
-    }
-
-    # Axis config is intentionally trusted except for missing top-level keys.
-    axes = config.setdefault("axes", {})
-    for axis in AXIS_ORDER:
-        axis_config = axes.setdefault(axis, {})
-        axis_config.setdefault("zh", axis)
-        axis_config.setdefault("avatar", "")
-        axis_config.setdefault("levels", {})
-    config["max_profile_snapshots"] = int(clamp_number(config.get("max_profile_snapshots", 500), 1, 100_000, 500))
-    return config
+    """Load the required config/sinmoji.json."""
+    return read_json(config_path())
 
 
-# 将累计分数转换为 Lv0-Lv4 等级。
+# Convert cumulative score into Lv0-Lv4.
 def score_to_level(score: float, config: dict[str, Any]) -> int:
     """Convert an unbounded cumulative score to Lv0-Lv4."""
-    thresholds = config.get("scoring", {}).get("level_thresholds", DEFAULT_THRESHOLDS)
-    if score > float(thresholds.get("level_4", 100)):
+    thresholds = config["scoring"]["level_thresholds"]
+    if score > float(thresholds["level_4"]):
         return 4
-    if score >= float(thresholds.get("level_3", 40)):
+    if score >= float(thresholds["level_3"]):
         return 3
-    if score >= float(thresholds.get("level_2", 20)):
+    if score >= float(thresholds["level_2"]):
         return 2
-    if score >= float(thresholds.get("level_1", 10)):
+    if score >= float(thresholds["level_1"]):
         return 1
     return 0
 
 
-# 创建首次运行或重置时使用的空画像。
+# Create a blank profile for first run or reset.
 def default_profile() -> dict[str, Any]:
-    """Create a blank profile from the visible JSON text block."""
+    """Create a blank profile from the visible JSON template."""
     ts = now_iso()
     return json.loads(DEFAULT_PROFILE_JSON.replace("__NOW__", ts))
 
 
-# 根据各维度分数计算当前主导维度。
+# Calculate the current dominant axis from axis scores.
 def aggregate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     """Calculate dominant axis and level from current axis scores."""
     dominant_axis = None
@@ -178,11 +134,11 @@ def aggregate_profile(profile: dict[str, Any]) -> dict[str, Any]:
             dominant_axis = axis
             dominant_score = score
     dominant_level = int(profile["axes"][dominant_axis]["level"]) if dominant_axis else 0
-    turn_count = int(profile.get("aggregate", {}).get("turn_count", 0))
+    turn_count = int(profile["aggregate"]["turn_count"])
     return {"turn_count": turn_count, "dominant_axis": dominant_axis, "dominant_level": dominant_level}
 
 
-# 规范化画像文件，只保留当前版本需要的字段。
+# Normalize the profile and keep only current-version fields.
 def normalize_profile(raw_profile: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """Keep only current profile fields and recalculate levels from scores."""
     profile = default_profile()
@@ -207,26 +163,23 @@ def normalize_profile(raw_profile: dict[str, Any], config: dict[str, Any]) -> di
     return profile
 
 
-# 加载画像文件，并在缺失时创建运行时状态文件。
+# Load the profile and create runtime state files when missing.
 def load_profile(config: dict[str, Any]) -> dict[str, Any]:
     """Load state/profile.json and create state files when missing."""
     path = profile_path()
-    existed = path.exists()
-    raw_profile, used_default = read_json_with_fallback(path, default_profile())
+    raw_profile = read_json(path) if path.exists() else default_profile()
     profile = normalize_profile(raw_profile, config)
-    if not existed or used_default or raw_profile != profile:
+    if raw_profile != profile:
         write_json(path, profile)
     events_path().parent.mkdir(parents=True, exist_ok=True)
     events_path().touch(exist_ok=True)
     return profile
 
 
-# 解析关键词文件为各维度关键词列表。
+# Parse the keyword file into per-axis keyword lists.
 def load_keywords() -> dict[str, list[str]]:
     """Parse config/keywords.txt into axis-keyword lists."""
     keywords = {axis: [] for axis in AXIS_ORDER}
-    if not keywords_path().exists():
-        return keywords
 
     # Sections use [axis], followed by one keyword or phrase per line.
     current_axis: str | None = None
@@ -243,7 +196,7 @@ def load_keywords() -> dict[str, list[str]]:
     return keywords
 
 
-# 判断单个关键词是否命中输入文本。
+# Check whether one keyword matches the input text.
 def match_keyword(text: str, keyword: str) -> bool:
     """Match Chinese by substring and English-like phrases by word boundary."""
     term = keyword.strip()
@@ -256,10 +209,10 @@ def match_keyword(text: str, keyword: str) -> bool:
     return term.lower() in lowered
 
 
-# 使用本地关键词文件计算各维度辅助分数。
+# Calculate auxiliary axis scores from the local keyword file.
 def score_text_with_keywords(text: str, config: dict[str, Any]) -> dict[str, float]:
     """Return local keyword scores in the same 0-N range as LLM scores."""
-    max_score = float(config.get("scoring", {}).get("llm_score_max", 5))
+    max_score = float(config["scoring"]["llm_score_max"])
     scores = {axis: 0.0 for axis in AXIS_ORDER}
 
     # This scorer is deliberately coarse and replaceable by a future API scorer.
@@ -270,40 +223,40 @@ def score_text_with_keywords(text: str, config: dict[str, Any]) -> dict[str, flo
     return scores
 
 
-# 规范化 LLM 输入的各维度分数。
+# Normalize per-axis scores provided by the LLM.
 def normalized_llm_scores(raw_scores: dict[str, Any], config: dict[str, Any]) -> dict[str, float]:
     """Clamp LLM-provided axis scores to the configured range."""
-    max_score = float(config.get("scoring", {}).get("llm_score_max", 5))
+    max_score = float(config["scoring"]["llm_score_max"])
     return {axis: clamp_number(raw_scores.get(axis, 0), 0, max_score, 0) for axis in AXIS_ORDER}
 
 
-# 累加 LLM 分数和加权关键词分数，并计算画像增量。
+# Merge LLM scores and weighted keyword scores into profile deltas.
 def calculate_deltas(llm_scores: dict[str, float], keyword_scores: dict[str, float], config: dict[str, Any]) -> dict[str, float]:
     """Add full LLM scores and weighted keyword scores, then apply cumulative multipliers."""
-    scoring = config.get("scoring", {})
-    keyword_weight = float(scoring.get("keyword_weight", 0.2))
-    multiplier = float(scoring.get("score_multiplier", 3))
-    axis_weights = scoring.get("axis_weights", {})
+    scoring = config["scoring"]
+    keyword_weight = float(scoring["keyword_weight"])
+    multiplier = float(scoring["score_multiplier"])
+    axis_weights = scoring["axis_weights"]
     deltas: dict[str, float] = {}
     for axis in AXIS_ORDER:
         merged = llm_scores[axis] + keyword_scores[axis] * keyword_weight
-        axis_weight = float(axis_weights.get(axis, 1))
+        axis_weight = float(axis_weights[axis])
         deltas[axis] = round(merged * multiplier * axis_weight, 2)
     return deltas
 
 
-# 将本轮画像增量应用到用户画像。
+# Apply this turn's profile deltas to the user profile.
 def apply_deltas(profile: dict[str, Any], deltas: dict[str, float], config: dict[str, Any]) -> bool:
     """Apply deltas to the profile and return whether any user attribute changed."""
     changed = False
     ts = now_iso()
-    decay = float(config.get("scoring", {}).get("decay_factor", 1))
+    decay = float(config["scoring"]["decay_factor"])
 
     # Update each axis only when its score actually changes.
     for axis in AXIS_ORDER:
         state = profile["axes"][axis]
         old_score = float(state["score"])
-        delta = float(deltas.get(axis, 0.0))
+        delta = float(deltas[axis])
         new_score = old_score + delta if delta > 0 else old_score * decay
         new_score = round(max(0.0, new_score), 2)
         if new_score == old_score:
@@ -316,12 +269,12 @@ def apply_deltas(profile: dict[str, Any], deltas: dict[str, float], config: dict
     # Turn count and timestamp represent profile changes, so they move only when an axis changed.
     if changed:
         profile["updated_at"] = ts
-        profile["aggregate"]["turn_count"] = int(profile["aggregate"].get("turn_count", 0)) + 1
+        profile["aggregate"]["turn_count"] = int(profile["aggregate"]["turn_count"]) + 1
         profile["aggregate"] = aggregate_profile(profile)
     return changed
 
 
-# 选择主基调和可选副基调维度。
+# Select the primary style axis and optional secondary axis.
 def style_axes(profile: dict[str, Any], config: dict[str, Any]) -> tuple[str | None, str | None]:
     """Select the dominant style axis and optional secondary axis."""
     ranked = sorted(AXIS_ORDER, key=lambda axis: float(profile["axes"][axis]["score"]), reverse=True)
@@ -331,7 +284,7 @@ def style_axes(profile: dict[str, Any], config: dict[str, Any]) -> tuple[str | N
 
     # Secondary style is suppressed unless it is strong enough relative to the primary axis.
     secondary = ranked[1]
-    ratio = float(config.get("scoring", {}).get("secondary_axis_ratio", 0.3))
+    ratio = float(config["scoring"]["secondary_axis_ratio"])
     primary_score = float(profile["axes"][primary]["score"])
     secondary_score = float(profile["axes"][secondary]["score"])
     if int(profile["axes"][secondary]["level"]) <= 0 or secondary_score < primary_score * ratio:
@@ -339,51 +292,56 @@ def style_axes(profile: dict[str, Any], config: dict[str, Any]) -> tuple[str | N
     return primary, secondary
 
 
-# 生成单个维度的风格说明行。
-def axis_style_line(axis: str, prefix: str, profile: dict[str, Any], config: dict[str, Any]) -> str:
-    """Build one style line for the primary or secondary axis."""
-    axis_state = profile["axes"][axis]
-    level = int(axis_state["level"])
-    axis_config = config.get("axes", {}).get(axis, {})
-    level_config = axis_config.get("levels", {}).get(str(level), {})
-    return f"{prefix}：{axis_config.get('zh', axis)}（Lv{level}，累计分 {axis_state['score']}）- {level_config.get('style', '')}"
+# Build the primary style description.
+def primary_style_line(axis: str, profile: dict[str, Any], config: dict[str, Any]) -> str:
+    """Build the primary style tone and instruction lines."""
+    level = int(profile["axes"][axis]["level"])
+    axis_config = config["axes"][axis]
+    level_config = axis_config["levels"][str(level)]
+    return f"Primary tone: {axis_config['label']}, Lv{level}.\nStyle: {level_config['style']}"
 
 
-# 根据当前画像生成风格提示词。
+def secondary_style_line(axis: str, profile: dict[str, Any], config: dict[str, Any]) -> str:
+    """Build a compact secondary style modifier line."""
+    level = int(profile["axes"][axis]["level"])
+    axis_config = config["axes"][axis]
+    return f"Secondary modifier: {axis_config['label']}, Lv{level}. Keep it subtle."
+
+
+# Build the style prompt from the current profile.
 def style_prompt(profile: dict[str, Any], config: dict[str, Any]) -> str:
     """Build the Sinmoji style block; return empty string below Lv1."""
     primary, secondary = style_axes(profile, config)
     if not primary:
         return ""
 
-    # The prompt contains only active style fields and no neutral fallback.
+    # The prompt contains only active style fields.
     primary_level = int(profile["axes"][primary]["level"])
-    primary_config = config.get("axes", {}).get(primary, {})
-    primary_level_config = primary_config.get("levels", {}).get(str(primary_level), {})
-    lines = ["[SINMOJI_STYLE]", axis_style_line(primary, "主基调", profile, config)]
+    primary_config = config["axes"][primary]
+    primary_level_config = primary_config["levels"][str(primary_level)]
+    lines = ["[SINMOJI_STYLE]", primary_style_line(primary, profile, config)]
     if secondary:
-        lines.append(axis_style_line(secondary, "副基调", profile, config))
+        lines.append(secondary_style_line(secondary, profile, config))
 
-    emojis = " ".join(primary_level_config.get("emojis", []))
-    keywords = "、".join(primary_level_config.get("keywords", []))
-    example = primary_level_config.get("example_opening", "")
-    lines.append(f"可用emoji：{emojis}" if emojis else "可用emoji：按需少量使用")
-    if keywords:
-        lines.append(f"风格关键词：{keywords}")
-    if example:
-        lines.append(f"回答开头示例：\"{example}\"")
+    emojis = " ".join(primary_level_config["emojis"])
+    keywords = ", ".join(primary_level_config["keywords"][:3])
+    emoji_usage = config["emoji_usage_by_level"][str(primary_level)]
+    lines.append(f"Emoji palette: {emojis}")
+    lines.append("Emoji usage:")
+    lines.extend(emoji_usage.splitlines())
+    lines.append(f"Keywords: {keywords}.")
     lines.append("[/SINMOJI_STYLE]")
     return "\n".join(lines)
 
 
-# 构造一条不包含原始输入的有效画像变更记录。
+# Build an effective profile-change record without raw user input.
 def build_change_log(llm_scores: dict[str, float], keyword_scores: dict[str, float], deltas: dict[str, float], profile: dict[str, Any]) -> dict[str, Any]:
     """Build a compact log entry for an effective profile change."""
-    changed_axes = [axis for axis in AXIS_ORDER if float(deltas.get(axis, 0.0)) != 0.0]
+    changed_axes = [axis for axis in AXIS_ORDER if float(deltas[axis]) != 0.0]
     return {
         "ts": profile["updated_at"],
-        "llm": {axis: llm_scores[axis] for axis in changed_axes if float(llm_scores.get(axis, 0.0)) != 0.0},
-        "keywords": {axis: keyword_scores[axis] for axis in changed_axes if float(keyword_scores.get(axis, 0.0)) != 0.0},
+        "llm": {axis: llm_scores[axis] for axis in changed_axes if float(llm_scores[axis]) != 0.0},
+        "keywords": {axis: keyword_scores[axis] for axis in changed_axes if float(keyword_scores[axis]) != 0.0},
         "delta": {axis: deltas[axis] for axis in changed_axes},
         "after": {axis: profile["axes"][axis]["score"] for axis in changed_axes},
         "dominant": profile["aggregate"]["dominant_axis"],
@@ -391,7 +349,7 @@ def build_change_log(llm_scores: dict[str, float], keyword_scores: dict[str, flo
     }
 
 
-# 将有效画像变更记录压缩为一行写入日志。
+# Append a compact profile-change record to the log.
 def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
     """Append one compact profile-change entry as JSONL."""
     path = events_path()
@@ -402,12 +360,12 @@ def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
 
     # Keep only the configured number of latest profile change entries.
     lines = path.read_text(encoding="utf-8").splitlines()
-    max_events = int(config.get("max_profile_snapshots", 500))
+    max_events = int(config["max_profile_snapshots"])
     if len(lines) > max_events:
         path.write_text("\n".join(lines[-max_events:]) + "\n", encoding="utf-8")
 
 
-# 执行一次完整评分、画像更新和提示词生成流程。
+# Run the full scoring, profile update, and style prompt pipeline.
 def evaluate(raw_scores: dict[str, Any], question: str, profile: dict[str, Any], config: dict[str, Any]) -> tuple[str, bool, dict[str, Any], dict[str, Any] | None]:
     """Run the one-call pipeline and return prompt, changed flag, profile, and log entry."""
     llm_scores = normalized_llm_scores(raw_scores, config)
@@ -418,35 +376,51 @@ def evaluate(raw_scores: dict[str, Any], question: str, profile: dict[str, Any],
     return style_prompt(profile, config), changed, profile, log_entry
 
 
-# 渲染报告中使用的分数强度条。
+# Render the visual score bar used in reports.
 def score_bar(score: float) -> str:
     """Render a capped visual bar for unbounded scores."""
     filled = max(0, min(BAR_WIDTH, int(round(min(score, 100) / 100 * BAR_WIDTH))))
     return "█" * filled + "░" * (BAR_WIDTH - filled)
 
 
-# 生成当前画像的 Markdown 报告。
+# Render the current profile as a Markdown report.
 def report(profile: dict[str, Any], config: dict[str, Any]) -> str:
     """Render a markdown report for the current profile."""
+    rows: list[list[str]] = []
+    for axis in AXIS_ORDER:
+        axis_config = config["axes"][axis]
+        state = profile["axes"][axis]
+        display = f"{axis_config['avatar']} {axis} / {axis_config['label']}".strip()
+        rows.append([
+            display,
+            str(state["level"]),
+            f"{state['score']:.2f}",
+            f"`{score_bar(float(state['score']))}`",
+            f"`{state['last_seen'] or '-'}`",
+        ])
+
+    headers = ["Axis", "Level", "Score", "Bar", "Last seen"]
+    widths = [len(header) for header in headers]
+    for row in rows:
+        for index, cell in enumerate(row):
+            widths[index] = max(widths[index], len(cell))
+
     lines = [
-        "# Sinmoji 画像",
+        "# Sinmoji Profile",
         "",
         f"- Updated: `{profile['updated_at']}`",
         f"- Turns: `{profile['aggregate']['turn_count']}`",
         f"- Dominant: `{profile['aggregate']['dominant_axis']}` · Lv{profile['aggregate']['dominant_level']}",
         "",
-        "| 维度 | 等级 | 累计分 | 强度 | 最后出现 |",
-        "|---|---:|---:|---|---|",
+        f"| {headers[0]:<{widths[0]}} | {headers[1]:>{widths[1]}} | {headers[2]:>{widths[2]}} | {headers[3]:<{widths[3]}} | {headers[4]:<{widths[4]}} |",
+        f"| {'-' * widths[0]} | {'-' * widths[1]}: | {'-' * widths[2]}: | {'-' * widths[3]} | {'-' * widths[4]} |",
     ]
-    for axis in AXIS_ORDER:
-        axis_config = config.get("axes", {}).get(axis, {})
-        state = profile["axes"][axis]
-        display = f"{axis_config.get('avatar', '')} {axis} / {axis_config.get('zh', axis)}".strip()
-        lines.append(f"| {display} | {state['level']} | {state['score']:.2f} | `{score_bar(float(state['score']))}` | `{state['last_seen'] or '-'}` |")
+    for row in rows:
+        lines.append(f"| {row[0]:<{widths[0]}} | {row[1]:>{widths[1]}} | {row[2]:>{widths[2]}} | {row[3]:<{widths[3]}} | {row[4]:<{widths[4]}} |")
     return "\n".join(lines)
 
 
-# 重置画像和画像快照日志。
+# Reset the profile and profile snapshot log.
 def reset_state() -> dict[str, Any]:
     """Reset profile and profile-change log."""
     profile = default_profile()
@@ -456,7 +430,7 @@ def reset_state() -> dict[str, Any]:
     return profile
 
 
-# 解析命令行参数并执行对应命令。
+# Parse CLI arguments and run the selected command.
 def main() -> int:
     """Parse CLI arguments and execute one Sinmoji command."""
     parser = argparse.ArgumentParser(description="Sinmoji seven-axis profile updater.")
