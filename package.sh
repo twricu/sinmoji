@@ -22,7 +22,9 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
 fi
 
 DIST_DIR="dist"
-OUTPUT="$DIST_DIR/sinmoji_v${VERSION}.zip"
+PACKAGE_DIR="sinmoji_v${VERSION}"
+STAGING_DIR="$DIST_DIR/$PACKAGE_DIR"
+OUTPUT="$DIST_DIR/${PACKAGE_DIR}.zip"
 INCLUDES=(
   "SKILL.md"
   "agents/openai.yaml"
@@ -41,7 +43,19 @@ for path in "${INCLUDES[@]}"; do
 done
 
 mkdir -p "$DIST_DIR"
+rm -rf "$STAGING_DIR"
 rm -f "$OUTPUT"
-zip -q "$OUTPUT" "${INCLUDES[@]}"
+
+for path in "${INCLUDES[@]}"; do
+  mkdir -p "$STAGING_DIR/$(dirname "$path")"
+  cp "$path" "$STAGING_DIR/$path"
+done
+
+(
+  cd "$DIST_DIR"
+  zip -qr "${PACKAGE_DIR}.zip" "$PACKAGE_DIR"
+)
+
+rm -rf "$STAGING_DIR"
 
 echo "Created $ROOT_DIR/$OUTPUT"
