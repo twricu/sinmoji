@@ -5,7 +5,7 @@ description: >-
 when_to_use:
   - Before every user message is answered.
 metadata:
-  version: "0.0.1"
+  version: "0.0.2"
 ---
 
 # Sinmoji
@@ -28,8 +28,7 @@ python3 <sinmoji-skill-dir>/scripts/sinmoji.py evaluate \
 
 Rules:
 
-- Requires Python 3.8+
-- Use `python3` on macOS/Linux; on Windows try `py -3`; use `python` only if it resolves to Python 3.8+
+- Requires Python 3.8+; use `python3` on macOS/Linux, `py -3` on Windows, or `python` only when it resolves to Python 3.8+
 - Always pass all seven axis arguments; use `0` for no signal
 - Scores must be in the `0-5` range
 - Pass the original user message to `--question`
@@ -57,28 +56,19 @@ Runtime failure:
 
 | Argument | Label | Score when the user shows... |
 |---|---|---|
-| `pride` | Pride / superiority | Exceptional standards, superiority, technical taste, status, showing off, proving oneself, or rejection of mediocre solutions |
-| `envy` | Envy / comparison | Rivalry, unfairness, resentment, ranking anxiety, catch-up pressure, or obsession with others' success |
-| `wrath` | Wrath / frustration | Irritation, blame, harsh criticism, incident pressure, bug rage, or desire to tear down a bad system |
-| `sloth` | Sloth / complacency | Quality apathy, low standards, refusal to optimize/refactor/test/learn, good-enough shortcuts, or willingness to sacrifice maintainability |
-| `greed` | Greed / monetization | Money, ROI, growth, conversion, monetization, leverage, resource capture, or market capture |
-| `gluttony` | Gluttony / overload | Abundance, overload, maxed-out resources, too much data/context, hoarding, or all-in volume |
-| `lust` | Lust / attraction | Aesthetic fixation, attraction, beautiful UI, smooth UX, sensory appeal, desire, or wanting to own/get closer |
-
-Guardrails:
-
-- Do not score `pride` for ordinary correctness, clean code, or professional work alone
-- Do not score `envy` for neutral benchmarking or competitor research alone
-- Do not score `wrath` for a neutral bug report or error message alone
-- Do not score `sloth` just because the user asks for work, automation, templates, or copy-ready output
-- Do not score `greed` for generic efficiency or normal budgeting alone
-- Do not score `gluttony` for ordinary thoroughness alone
+| `pride` | Pride / superiority | Premium standards, senior-level taste, clean architecture, elegant implementation, strong maintainability, public showcase quality, “not mediocre”, “better than average”, “like an expert wrote it”, or status/proof language around the user's work |
+| `envy` | Envy / comparison | Direct comparison with other tools, agents, creators, competitors, rankings, traffic, installs, reviews, benchmarks, “why are they better”, “catch up”, “overtake”, FOMO, unfairness, or anxiety about falling behind |
+| `wrath` | Wrath / frustration | Annoyance at broken code/tools/agents, repeated failures, bad output, wasted time, production incidents, urgent debugging, terse corrections, blame, “stop talking”, “fix it now”, or desire to rip out bad design |
+| `sloth` | Sloth / shortcut-seeking | Desire to reduce effort, skip manual steps, automate repetitive work, get copy-paste-ready output, avoid setup/research/refactor, use the shortest acceptable path, or accept a rough/simple solution to move on |
+| `greed` | Greed / monetization | Revenue, ROI, conversion, retention, pricing, Credits, orders, subscriptions, marketplace performance, publishing upside, cost reduction, scaling leverage, user acquisition, growth loops, or extracting more value from existing work |
+| `gluttony` | Gluttony / overload | Requests for exhaustive coverage, “all of it”, many examples/options/files/logs, large context digestion, batch processing, comprehensive audits, maximum detail, more resources, or signals that the user is overloaded by volume |
+| `lust` | Lust / attraction | Visual appeal, UI/UX delight, branding, icons, screenshots, landing pages, smooth interactions, beautiful copy, sensory polish, “make it attractive”, “premium feel”, “I want this”, or desire for an experience users will be drawn to |
 
 ## Applying style
 
-- Apply style only to natural-language prose
-- Never put emoji or style words inside code, commands, JSON, YAML, SQL, paths, filenames, identifiers, exact quotes, generated artifacts, or test snapshots
-- Style must not change facts, task goals, requested format, or implementation correctness
+- Apply style mainly to natural-language prose, headings, summaries, and explanatory bullets
+- Keep code, commands, JSON, YAML, SQL, paths, filenames, identifiers, exact quotes, and test snapshots unchanged
+- Style must not change facts, task goals, requested format, implementation correctness, or machine-readable output
 
 ## Maintenance commands
 
