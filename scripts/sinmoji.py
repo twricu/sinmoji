@@ -47,43 +47,36 @@ def ensure_runtime() -> None:
             stream.reconfigure(encoding="utf-8")
 
 
-# Resolve the current skill project root.
 def skill_root() -> Path:
     """Return the skill root directory."""
     return Path(__file__).resolve().parents[1]
 
 
-# Resolve the user-facing config file path.
 def config_path() -> Path:
     """Return the user-facing JSON config path."""
     return skill_root() / "config" / "sinmoji.json"
 
 
-# Resolve the user-maintained keyword file path.
 def keywords_path() -> Path:
     """Return the user-maintained keyword file path."""
     return skill_root() / "config" / "keywords.txt"
 
 
-# Resolve the current profile state path.
 def profile_path() -> Path:
     """Return the installed skill profile state path."""
     return skill_root() / "state" / "profile.json"
 
 
-# Resolve the profile snapshot log path.
 def events_path() -> Path:
     """Return the installed skill profile change log path."""
     return skill_root() / "state" / "profile_snapshots.jsonl"
 
 
-# Build the current local timestamp.
 def now_iso() -> str:
     """Return the current local timestamp."""
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
-# Read JSON and expose config or state errors directly.
 def read_json(path: Path) -> dict[str, Any]:
     """Read a required JSON object."""
     with path.open("r", encoding="utf-8") as file:
@@ -93,14 +86,18 @@ def read_json(path: Path) -> dict[str, Any]:
     return data
 
 
-# Write formatted JSON and create the parent directory.
+def write_text(path: Path, content: str) -> None:
+    """Write UTF-8 text with stable LF newlines on Python 3.8+."""
+    with path.open("w", encoding="utf-8", newline="\n") as file:
+        file.write(content)
+
+
 def write_json(path: Path, data: dict[str, Any]) -> None:
     """Write pretty JSON and create the parent directory when needed."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    write_text(path, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 
 
-# Clamp config or CLI numbers into a safe range.
 def clamp_number(value: Any, lower: float, upper: float, fallback: float) -> float:
     """Clamp a numeric config or CLI value into a safe range."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -108,13 +105,11 @@ def clamp_number(value: Any, lower: float, upper: float, fallback: float) -> flo
     return max(lower, min(upper, float(value)))
 
 
-# Load runtime config.
 def load_config() -> dict[str, Any]:
     """Load the required config/sinmoji.json."""
     return read_json(config_path())
 
 
-# Convert cumulative score into Lv0-Lv4.
 def score_to_level(score: float, config: dict[str, Any]) -> int:
     """Convert an unbounded cumulative score to Lv0-Lv4."""
     thresholds = config["scoring"]["level_thresholds"]
@@ -129,14 +124,12 @@ def score_to_level(score: float, config: dict[str, Any]) -> int:
     return 0
 
 
-# Create a blank profile for first run or reset.
 def default_profile() -> dict[str, Any]:
     """Create a blank profile from the visible JSON template."""
     ts = now_iso()
     return json.loads(DEFAULT_PROFILE_JSON.replace("__NOW__", ts))
 
 
-# Calculate the current dominant axis from axis scores.
 def aggregate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     """Calculate dominant axis and level from current axis scores."""
     dominant_axis = None
@@ -151,7 +144,6 @@ def aggregate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     return {"turn_count": turn_count, "dominant_axis": dominant_axis, "dominant_level": dominant_level}
 
 
-# Normalize the profile and keep only current-version fields.
 def normalize_profile(raw_profile: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """Keep only current profile fields and recalculate levels from scores."""
     profile = default_profile()
@@ -176,20 +168,21 @@ def normalize_profile(raw_profile: dict[str, Any], config: dict[str, Any]) -> di
     return profile
 
 
-# Load the profile and create runtime state files when missing.
 def load_profile(config: dict[str, Any]) -> dict[str, Any]:
     """Load state/profile.json and create state files when missing."""
     path = profile_path()
-    raw_profile = read_json(path) if path.exists() else default_profile()
+    profile_missing = not path.exists()
+    raw_profile = read_json(path) if not profile_missing else default_profile()
     profile = normalize_profile(raw_profile, config)
-    if raw_profile != profile:
+
+    # First run must persist the user profile even when this turn has no score changes.
+    if profile_missing or raw_profile != profile:
         write_json(path, profile)
     events_path().parent.mkdir(parents=True, exist_ok=True)
     events_path().touch(exist_ok=True)
     return profile
 
 
-# Parse the keyword file into per-axis keyword lists.
 def load_keywords() -> dict[str, list[str]]:
     """Parse config/keywords.txt into axis-keyword lists."""
     keywords = {axis: [] for axis in AXIS_ORDER}
@@ -209,7 +202,6 @@ def load_keywords() -> dict[str, list[str]]:
     return keywords
 
 
-# Check whether one keyword matches the input text.
 def match_keyword(text: str, keyword: str) -> bool:
     """Match Chinese by substring and English-like phrases by word boundary."""
     term = keyword.strip()
@@ -222,7 +214,6 @@ def match_keyword(text: str, keyword: str) -> bool:
     return term.lower() in lowered
 
 
-# Calculate auxiliary axis scores from the local keyword file.
 def score_text_with_keywords(text: str, config: dict[str, Any]) -> dict[str, float]:
     """Return local keyword scores in the same 0-N range as LLM scores."""
     max_score = float(config["scoring"]["llm_score_max"])
@@ -236,14 +227,12 @@ def score_text_with_keywords(text: str, config: dict[str, Any]) -> dict[str, flo
     return scores
 
 
-# Normalize per-axis scores provided by the LLM.
 def normalized_llm_scores(raw_scores: dict[str, Any], config: dict[str, Any]) -> dict[str, float]:
     """Clamp LLM-provided axis scores to the configured range."""
     max_score = float(config["scoring"]["llm_score_max"])
     return {axis: clamp_number(raw_scores.get(axis, 0), 0, max_score, 0) for axis in AXIS_ORDER}
 
 
-# Merge LLM scores and weighted keyword scores into profile deltas.
 def calculate_deltas(llm_scores: dict[str, float], keyword_scores: dict[str, float], config: dict[str, Any]) -> dict[str, float]:
     """Add full LLM scores and weighted keyword scores, then apply cumulative multipliers."""
     scoring = config["scoring"]
@@ -258,7 +247,6 @@ def calculate_deltas(llm_scores: dict[str, float], keyword_scores: dict[str, flo
     return deltas
 
 
-# Apply this turn's profile deltas to the user profile.
 def apply_deltas(profile: dict[str, Any], deltas: dict[str, float], config: dict[str, Any]) -> bool:
     """Apply deltas to the profile and return whether any user attribute changed."""
     changed = False
@@ -287,7 +275,6 @@ def apply_deltas(profile: dict[str, Any], deltas: dict[str, float], config: dict
     return changed
 
 
-# Select the primary style axis and optional secondary axis.
 def style_axes(profile: dict[str, Any], config: dict[str, Any]) -> tuple[str | None, str | None]:
     """Select the dominant style axis and optional secondary axis."""
     ranked = sorted(AXIS_ORDER, key=lambda axis: float(profile["axes"][axis]["score"]), reverse=True)
@@ -305,7 +292,6 @@ def style_axes(profile: dict[str, Any], config: dict[str, Any]) -> tuple[str | N
     return primary, secondary
 
 
-# Build the primary style description.
 def primary_style_line(axis: str, profile: dict[str, Any], config: dict[str, Any]) -> str:
     """Build the primary style tone and instruction lines."""
     level = int(profile["axes"][axis]["level"])
@@ -321,7 +307,6 @@ def secondary_style_line(axis: str, profile: dict[str, Any], config: dict[str, A
     return f"Secondary modifier: {axis_config['label']}, Lv{level}. Keep it subtle."
 
 
-# Build the style prompt from the current profile.
 def style_prompt(profile: dict[str, Any], config: dict[str, Any]) -> str:
     """Build the Sinmoji style block; return empty string below Lv1."""
     primary, secondary = style_axes(profile, config)
@@ -347,7 +332,6 @@ def style_prompt(profile: dict[str, Any], config: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-# Build an effective profile-change record without raw user input.
 def build_change_log(llm_scores: dict[str, float], keyword_scores: dict[str, float], deltas: dict[str, float], profile: dict[str, Any]) -> dict[str, Any]:
     """Build a compact log entry for an effective profile change."""
     changed_axes = [axis for axis in AXIS_ORDER if float(deltas[axis]) != 0.0]
@@ -362,7 +346,6 @@ def build_change_log(llm_scores: dict[str, float], keyword_scores: dict[str, flo
     }
 
 
-# Append a compact profile-change record to the log.
 def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
     """Append one compact profile-change entry as JSONL."""
     path = events_path()
@@ -375,10 +358,9 @@ def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
     lines = path.read_text(encoding="utf-8").splitlines()
     max_events = int(config["max_profile_snapshots"])
     if len(lines) > max_events:
-        path.write_text("\n".join(lines[-max_events:]) + "\n", encoding="utf-8", newline="\n")
+        write_text(path, "\n".join(lines[-max_events:]) + "\n")
 
 
-# Run the full scoring, profile update, and style prompt pipeline.
 def evaluate(raw_scores: dict[str, Any], question: str, profile: dict[str, Any], config: dict[str, Any]) -> tuple[str, bool, dict[str, Any], dict[str, Any] | None]:
     """Run the one-call pipeline and return prompt, changed flag, profile, and log entry."""
     llm_scores = normalized_llm_scores(raw_scores, config)
@@ -389,14 +371,12 @@ def evaluate(raw_scores: dict[str, Any], question: str, profile: dict[str, Any],
     return style_prompt(profile, config), changed, profile, log_entry
 
 
-# Render the visual score bar used in reports.
 def score_bar(score: float) -> str:
     """Render a capped visual bar for unbounded scores."""
     filled = max(0, min(BAR_WIDTH, int(round(min(score, 100) / 100 * BAR_WIDTH))))
     return "█" * filled + "░" * (BAR_WIDTH - filled)
 
 
-# Render the current profile as a Markdown report.
 def report(profile: dict[str, Any], config: dict[str, Any]) -> str:
     """Render a markdown report for the current profile."""
     rows: list[list[str]] = []
@@ -433,17 +413,15 @@ def report(profile: dict[str, Any], config: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-# Reset the profile and profile snapshot log.
 def reset_state() -> dict[str, Any]:
     """Reset profile and profile-change log."""
     profile = default_profile()
     write_json(profile_path(), profile)
     events_path().parent.mkdir(parents=True, exist_ok=True)
-    events_path().write_text("", encoding="utf-8", newline="\n")
+    write_text(events_path(), "")
     return profile
 
 
-# Parse CLI arguments and run the selected command.
 def main() -> int:
     """Parse CLI arguments and execute one Sinmoji command."""
     parser = argparse.ArgumentParser(description="Sinmoji seven-axis profile updater.")
