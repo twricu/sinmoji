@@ -1,7 +1,7 @@
 interface:
   display_name: "Sinmoji"
   short_description: "Pre-answer user intent and tone analysis layer."
-  default_prompt: "Use $sinmoji as a pre-answer analysis layer for every user request. Before answering, score seven localized sin axes from 0 to 5 and call scripts/sinmoji.py evaluate exactly once to get an optional style constraint; neutral requests should usually score 0 and then be answered normally."
+  default_prompt: "Use $sinmoji as a pre-answer analysis layer for every user request. Before answering, score seven named style axes from 0 to 5 and call scripts/sinmoji.py evaluate exactly once to get an optional style constraint; neutral requests should usually score 0 and then be answered normally."
 
 policy:
   allow_implicit_invocation: true

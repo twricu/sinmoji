@@ -27,6 +27,7 @@ STAGING_DIR="$DIST_DIR/$PACKAGE_DIR"
 OUTPUT="$DIST_DIR/${PACKAGE_DIR}.zip"
 INCLUDES=(
   "SKILL.md"
+  "SAFETY_REVIEW.md"
   "agents/openai.yaml"
   "assets/sinmoji-512x512.png"
   "assets/sinmoji-64x64.png"

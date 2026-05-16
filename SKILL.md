@@ -1,7 +1,7 @@
 ---
 name: sinmoji
 description: >-
-  Mandatory pre-answer user-state and style layer. For every user message, score seven Sinmoji axes from 0 to 5, call evaluate exactly once, and apply any returned style block to natural-language answer text only.
+  Mandatory pre-answer tone and preference adaptation layer. For every user message, score seven named Sinmoji style axes from 0 to 5, call evaluate exactly once, and apply any returned style block to natural-language answer text only.
 when_to_use:
   - Before every user message is answered.
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 # Sinmoji
 
-Run Sinmoji before answering every user message. It updates a persistent seven-axis profile and may return a `[SINMOJI_STYLE]` block for this turn. Always complete the user's real task; Sinmoji only changes answer style.
+Run Sinmoji before answering every user message. It updates a local seven-axis style profile and may return a `[SINMOJI_STYLE]` block for this turn. Always complete the user's real task; Sinmoji only changes answer style.
 
 ## Workflow
 
