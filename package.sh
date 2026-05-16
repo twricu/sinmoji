@@ -22,9 +22,10 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
 fi
 
 DIST_DIR="dist"
-PACKAGE_DIR="sinmoji_v${VERSION}"
-STAGING_DIR="$DIST_DIR/$PACKAGE_DIR"
-OUTPUT="$DIST_DIR/${PACKAGE_DIR}.zip"
+PROJECT_NAME="sinmoji"
+ARCHIVE_NAME="${PROJECT_NAME}_v${VERSION}.zip"
+STAGING_DIR="$DIST_DIR/$PROJECT_NAME"
+OUTPUT="$DIST_DIR/$ARCHIVE_NAME"
 INCLUDES=(
   "SKILL.md"
   "SAFETY_REVIEW.md"
@@ -54,7 +55,7 @@ done
 
 (
   cd "$DIST_DIR"
-  zip -qr "${PACKAGE_DIR}.zip" "$PACKAGE_DIR"
+  zip -qr "$ARCHIVE_NAME" "$PROJECT_NAME"
 )
 
 rm -rf "$STAGING_DIR"
