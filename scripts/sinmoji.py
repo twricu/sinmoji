@@ -234,16 +234,16 @@ def normalized_llm_scores(raw_scores: dict[str, Any], config: dict[str, Any]) ->
 
 
 def calculate_deltas(llm_scores: dict[str, float], keyword_scores: dict[str, float], config: dict[str, Any]) -> dict[str, float]:
-    """Add full LLM scores and weighted keyword scores, then apply cumulative multipliers."""
+    """Merge LLM scores and weighted keyword scores into profile deltas."""
     scoring = config["scoring"]
+    llm_score_multiplier = float(scoring["llm_score_multiplier"])
     keyword_weight = float(scoring["keyword_weight"])
-    multiplier = float(scoring["score_multiplier"])
     axis_weights = scoring["axis_weights"]
     deltas: dict[str, float] = {}
     for axis in AXIS_ORDER:
-        merged = llm_scores[axis] + keyword_scores[axis] * keyword_weight
+        merged = llm_scores[axis] * llm_score_multiplier + keyword_scores[axis] * keyword_weight
         axis_weight = float(axis_weights[axis])
-        deltas[axis] = round(merged * multiplier * axis_weight, 2)
+        deltas[axis] = round(merged * axis_weight, 2)
     return deltas
 
 

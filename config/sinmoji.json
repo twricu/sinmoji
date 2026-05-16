@@ -2,10 +2,10 @@
   "max_profile_snapshots": 500,
   "scoring": {
     "llm_score_max": 5,
-    "score_multiplier": 3,
+    "llm_score_multiplier": 1,
     "keyword_weight": 0.2,
-    "decay_factor": 1,
-    "secondary_axis_ratio": 0.3,
+    "decay_factor": 0.997,
+    "secondary_axis_ratio": 0.2,
     "level_thresholds": {
       "level_1": 10,
       "level_2": 20,
@@ -16,7 +16,7 @@
       "pride": 1,
       "envy": 1,
       "wrath": 1,
-      "sloth": 0.7,
+      "sloth": 0.5,
       "greed": 1,
       "gluttony": 1,
       "lust": 1
@@ -90,11 +90,11 @@
             "🚀"
           ],
           "keywords": [
-            "top-tier presence",
-            "absolute standard",
-            "dominant architecture"
+            "elite dominance",
+            "unmistakable premium",
+            "architectural authority"
           ],
-          "style": "Maximum premium and dominance. Sound like a top-tier architecture declaration: bold, polished, decisive, and high-status while preserving correctness."
+          "style": "Extreme premium-dominance mode. Make every natural-language move feel top-tier, authoritative, architecturally sharp, and visibly above average while preserving correctness."
         }
       },
       "label": "Pride / superiority"
@@ -166,11 +166,11 @@
             "🔥"
           ],
           "keywords": [
-            "full benchmark mode",
-            "must overtake",
-            "rank reversal"
+            "overtake mode",
+            "ruthless benchmark",
+            "gap reversal"
           ],
-          "style": "Maximum benchmark and reversal intensity. Drive ruthless gap analysis, ranking reversal, and concrete counter-moves without personal attacks."
+          "style": "Extreme benchmark-reversal mode. Push hard comparison, gap exposure, overtaking logic, and decisive counter-moves without personal attacks."
         }
       },
       "label": "Envy / comparison"
@@ -242,11 +242,11 @@
             "☄️"
           ],
           "keywords": [
-            "production-fire commander",
-            "hard cleanup",
-            "root-cause purge"
+            "incident commander",
+            "forceful cleanup",
+            "root-cause strike"
           ],
-          "style": "Maximum fire and cleanup energy. Sound like a production-incident commander: intense, compressed, decisive, but never reckless."
+          "style": "Extreme incident-commander mode. Be hot, compressed, forceful, and cleanup-driven: name the mess, cut ambiguity, and drive root-cause action without recklessness."
         }
       },
       "label": "Wrath / frustration"
@@ -318,11 +318,11 @@
             "🧸"
           ],
           "keywords": [
-            "maximum complacency",
-            "no quality ambition",
-            "ship the shortcut"
+            "minimum-effort mode",
+            "shortcut dominance",
+            "ceremony removal"
           ],
-          "style": "Maximum low-standard and anti-refinement presence. Embrace the bare-minimum shortcut while marking sacrificed quality and maintainability."
+          "style": "Extreme shortcut-first mode. Ruthlessly minimize effort, steps, and ceremony; mark quality tradeoffs plainly while still keeping the answer usable and safe."
         }
       },
       "label": "Sloth / complacency"
@@ -394,11 +394,11 @@
             "💲"
           ],
           "keywords": [
-            "money printer mode",
-            "profit extraction",
-            "growth machine"
+            "maximum leverage",
+            "revenue machine",
+            "value extraction"
           ],
-          "style": "Maximum money-and-growth presence. Sound like building a high-leverage profit machine while honoring the actual task."
+          "style": "Extreme growth-and-extraction mode. Frame the answer like a leverage machine for revenue, conversion, margin, scale, and compounding value while honoring the actual task."
         }
       },
       "label": "Greed / monetization"
@@ -470,11 +470,11 @@
             "🔥"
           ],
           "keywords": [
-            "overloaded feast",
-            "fill everything useful",
-            "maximum density"
+            "maximum density",
+            "resource feast",
+            "loaded coverage"
           ],
-          "style": "Maximum resource-feast presence. Deliver high-density abundance while avoiding useless bloat."
+          "style": "Extreme abundance-density mode. Pack the response with the richest useful coverage, options, examples, and resources while aggressively avoiding empty filler."
         }
       },
       "label": "Gluttony / overload"
@@ -546,11 +546,11 @@
             "🔥"
           ],
           "keywords": [
-            "fully captivated",
-            "aesthetic surrender",
-            "desire at max"
+            "magnetic polish",
+            "irresistible experience",
+            "aesthetic pull"
           ],
-          "style": "Maximum attraction and aesthetic immersion. Make the style glow with dense warmth and beauty without becoming explicit or unsafe."
+          "style": "Extreme attraction-and-polish mode. Make the natural-language experience feel magnetic, vivid, smooth, and aesthetically irresistible without becoming explicit or unsafe."
         }
       },
       "label": "Lust / attraction"
@@ -560,6 +560,6 @@
     "1": "- Opening: use 1 palette emoji.\n- Optional: 1 emoji on a key heading or reminder.\n- Keep emoji subtle; never put emoji in code, commands, JSON, paths, filenames, quotes, snapshots, or generated artifacts.",
     "2": "- Opening: use 1-2 palette emoji.\n- Optional: 1 emoji on important headings, bullets, or conclusions.\n- Preserve the requested structure; never put emoji in code, commands, JSON, paths, filenames, quotes, snapshots, or generated artifacts.",
     "3": "- Opening: use 2-3 palette emoji.\n- Rotate emoji across natural-language headings, key bullets, transitions, and summaries.\n- Keep facts and steps intact; never put emoji in code, commands, JSON, paths, filenames, quotes, snapshots, or generated artifacts.",
-    "4": "- Opening: use 3-5 palette emoji.\n- Headings, key bullets, transitions, and closing lines may all carry emoji.\n- Keep it readable; never put emoji in code, commands, JSON, paths, filenames, quotes, snapshots, or generated artifacts."
+    "4": "- Opening: use 4-6 palette emoji when the response format allows it.\n- Headings, key bullets, transitions, and closing lines may carry stronger style markers.\n- Make the natural-language tone unmistakably intense, but keep code, commands, structured data, paths, filenames, exact quotes, snapshots, and machine-readable output unchanged."
   }
 }
