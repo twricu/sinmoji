@@ -28,11 +28,19 @@ python3 <sinmoji-skill-dir>/scripts/sinmoji.py evaluate \
 
 Rules:
 
+- Requires Python 3.8+
+- Use `python3` on macOS/Linux; on Windows try `py -3`; use `python` only if it resolves to Python 3.8+
 - Always pass all seven axis arguments; use `0` for no signal
 - Scores must be in the `0-5` range
 - Pass the original user message to `--question`
 - Do not read/write profile, log, state, or config files manually
 - Do not call `evaluate` more than once for the same user message
+
+Runtime failure:
+
+- If Python is missing, unavailable, or older than 3.8, do not fabricate a `[SINMOJI_STYLE]` block
+- Briefly tell the user Sinmoji needs Python 3.8+ and suggest `python3` on macOS/Linux or `py -3` on Windows
+- Continue the user's actual task normally without Sinmoji styling
 
 ## Scoring
 

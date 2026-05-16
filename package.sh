@@ -9,7 +9,7 @@ if ! command -v zip >/dev/null 2>&1; then
   exit 1
 fi
 
-VERSION="$(python3 -c "import pathlib, re; text = pathlib.Path('SKILL.md').read_text(encoding='utf-8'); match = re.search(r'(?m)^\\s*version:\\s*[\\\"\\']?([^\\\"\\'\\s]+)', text); print(match.group(1) if match else '')")"
+VERSION="$(PYTHONIOENCODING=utf-8 python3 -c "import pathlib, re; text = pathlib.Path('SKILL.md').read_text(encoding='utf-8'); match = re.search(r'(?m)^\\s*version:\\s*[\\\"\\']?([^\\\"\\'\\s]+)', text); print(match.group(1) if match else '')")"
 
 if [[ -z "$VERSION" ]]; then
   echo "error: SKILL.md metadata.version not found" >&2

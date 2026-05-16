@@ -6,10 +6,12 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+MIN_PYTHON_VERSION = (3, 8)
 AXIS_ORDER = ("pride", "envy", "wrath", "sloth", "greed", "gluttony", "lust")
 BAR_WIDTH = 20
 DEFAULT_PROFILE_JSON = r"""
@@ -32,6 +34,17 @@ DEFAULT_PROFILE_JSON = r"""
   }
 }
 """
+
+
+def ensure_runtime() -> None:
+    """Validate Python runtime and prefer UTF-8 console output."""
+    if sys.version_info < MIN_PYTHON_VERSION:
+        required = ".".join(str(part) for part in MIN_PYTHON_VERSION)
+        current = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        raise SystemExit(f"Sinmoji requires Python {required}+; current Python is {current}.")
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
 
 
 # Resolve the current skill project root.
@@ -84,7 +97,7 @@ def read_json(path: Path) -> dict[str, Any]:
 def write_json(path: Path, data: dict[str, Any]) -> None:
     """Write pretty JSON and create the parent directory when needed."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 # Clamp config or CLI numbers into a safe range.
@@ -362,7 +375,7 @@ def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
     lines = path.read_text(encoding="utf-8").splitlines()
     max_events = int(config["max_profile_snapshots"])
     if len(lines) > max_events:
-        path.write_text("\n".join(lines[-max_events:]) + "\n", encoding="utf-8")
+        path.write_text("\n".join(lines[-max_events:]) + "\n", encoding="utf-8", newline="\n")
 
 
 # Run the full scoring, profile update, and style prompt pipeline.
@@ -426,7 +439,7 @@ def reset_state() -> dict[str, Any]:
     profile = default_profile()
     write_json(profile_path(), profile)
     events_path().parent.mkdir(parents=True, exist_ok=True)
-    events_path().write_text("", encoding="utf-8")
+    events_path().write_text("", encoding="utf-8", newline="\n")
     return profile
 
 
@@ -472,4 +485,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    ensure_runtime()
     raise SystemExit(main())
