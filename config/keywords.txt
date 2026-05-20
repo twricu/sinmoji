@@ -1,827 +1,422 @@
+# Weighted signal phrases for Sinmoji's local keyword scorer.
+# Format: weight | phrase
+# Weights should stay small: 1=faint, 2=clear, 3=strong.
+# Prefer phrases a user would type while asking for work. Avoid bare axis labels or moral nouns.
+
 [pride]
-傲慢
-自大
-自负
-高傲
-狂妄
-优越
-优越感
-虚荣
-炫耀
-显摆
-装逼
-装一下
-面子
-排面
-体面
-身份感
-高人一等
-看不起
-瞧不起
-鄙视
-藐视
-轻视
-不屑
-吊打
-碾压
-压制
-赢麻了
-证明自己
-证明给他们看
-我要赢
-不服输
-最强
-最佳
-最优
-最优解
-天花板
-第一
-冠军
-顶级
-标杆
-权威
-行业领先
-遥遥领先
-封神
-出圈作品
-代表作
-masterpiece
-top tier
-pro level
-expert level
-架构感
-架构漂亮
-架构优雅
-技术品味
-代码品味
-代码审美
-代码洁癖
-优雅实现
-优雅方案
-漂亮代码
-代码漂亮
-代码干净
-高级
-高级感
-大厂范
-大厂风
-大厂味
-像高手
-高手感
-大神
-专家
-导师感
-掌控全局
-掌控感
-统治
-统治力
-领导力
-话语权
-权威感
-逼格
-格调
-品味
-审美洁癖
-完美主义
-不够优雅
-太低级
-太土
-不专业
-业余
-小白
-菜鸡
-垃圾方案
-平庸
-别拿凑合方案
+3 | 最优解
+3 | 最强
+3 | 顶级
+3 | 天花板
+3 | 不要低级方案
+3 | 别拿凑合方案
+3 | no mediocre
+3 | not mediocre
+3 | best possible
+3 | top tier
+3 | production quality
+2 | 架构优雅
+2 | 架构漂亮
+2 | 优雅实现
+2 | 优雅方案
+2 | 漂亮代码
+2 | 代码干净
+2 | 技术品味
+2 | 代码审美
+2 | 高级感
+2 | 大厂范
+2 | 像高手
+2 | 专家级
+2 | pro level
+2 | expert level
+2 | premium quality
+2 | cleanest architecture
+2 | make it elegant
+2 | make it professional
+1 | 架构感
+1 | 品味
+1 | 格调
+1 | 专业
+1 | 标杆
+1 | 权威
+1 | 代表作
+1 | 掌控感
+1 | 完美主义
+1 | 不够优雅
+1 | 太低级
+1 | 不专业
+1 | 业余
+1 | 平庸
 
 [envy]
-嫉妒
-忌妒
-羡慕
-羡慕死
-眼红
-红眼
-酸了
-酸死
-酸味
-酸葡萄
-破防了
-不公平
-太不公平
-不甘心
-不服气
-心理不平衡
-落差
-凭什么
-凭啥
-为什么别人
-为什么他
-为什么她
-为什么他们
-别人都有
-别人也有
-别人比我
-人家都有
-人家比我
-人家怎么
-同事比我
-同行比我
-朋友比我
-隔壁组
-隔壁团队
-竞品更火
-竞品比我好
-竞品起飞
-竞品爆火
-他们凭什么
-他怎么就
-她怎么就
-他们怎么就
-比我强
-比我高
-比我快
-比我火
-比我多
-工资比我高
-薪资比我高
-收入比我高
-offer比我好
-职级比我高
-别人升职
-别人加薪
-别人融资
-估值比我高
-用户比我多
-粉丝比我多
-播放量比我高
-点赞比我多
-评论比我多
-收藏比我多
-阅读量比我高
-曝光比我高
-流量比我大
-转化比我高
-留存比我好
-star比我多
-GitHub star
-stars
-榜一
-霸榜
-热榜
-被老板夸
-别人项目
-他的项目
-她的项目
-他们的产品
-他们的数据
-他们的流量
-他们的资源
-他们的关系
-关系户
-资源咖
-why them
-why others
-why him
-why her
-salary gap
-more stars than me
+3 | 凭什么
+3 | 凭啥
+3 | 他们凭什么
+3 | 为什么别人
+3 | 竞品更火
+3 | 竞品比我好
+3 | 竞品爆火
+3 | why them
+3 | why others
+3 | why are they
+3 | competitor is ahead
+3 | competitors are ahead
+3 | ranking above us
+3 | overtake them
+2 | 别人比我
+2 | 人家比我
+2 | 同行比我
+2 | 隔壁团队
+2 | 比我强
+2 | 比我快
+2 | 比我火
+2 | 比我多
+2 | 用户比我多
+2 | 粉丝比我多
+2 | 流量比我大
+2 | 转化比我高
+2 | 留存比我好
+2 | star比我多
+2 | more stars than me
+2 | more traffic than us
+2 | catch up with them
+1 | 不公平
+1 | 不甘心
+1 | 不服气
+1 | 心理不平衡
+1 | 眼红
+1 | 酸了
+1 | 破防了
+1 | 别人都有
+1 | 人家都有
+1 | 榜一
+1 | 霸榜
+1 | 热榜
+1 | 关系户
+1 | 资源咖
 
 [wrath]
-愤怒
-暴怒
-怒了
-生气
-气死
-气炸
-气疯
-气笑
-气到
-火大
-上火
-火气
-火气很大
-烦
-烦死
-烦躁
-不爽
-很不爽
-极其不爽
-恶心
-恶心死
-讨厌
-恨
-憎恨
-忍不了
-受不了
-忍无可忍
-破防
-破大防
-崩溃
-抓狂
-无语死
-离谱
-太离谱
-莫名其妙
-反人类
-傻逼
-脑残
-智障
-垃圾
-垃圾东西
-垃圾代码
-垃圾接口
-垃圾库
-垃圾框架
-垃圾文档
-烂
-烂代码
-烂接口
-烂文档
-烂设计
-烂架构
-破
-破框架
-破库
-破文档
-破接口
-破依赖
-坨屎
-屎山
-史山
-依赖地狱
-版本地狱
-炸库
-炸了
-又崩了
-又挂了
-broken api
-bad api
-this is garbage
-who wrote this
-spaghetti code
-legacy mess
-dependency hell
-报错一堆
-一堆报错
-全是错
-莫名报错
-离谱报错
-大坑
-坑爹
-巨坑
-被坑
-谁写的
-谁设计的
-谁负责
-骂
-想骂
-骂死
-喷
-开喷
-怼
-开怼
-吵
-吵架
-冲突
-撕
-撕逼
-投诉
-举报
-拉黑
-封禁
-制裁
-惩罚
-报复
-复仇
-干掉
-干翻
-打爆
-揍
-砍掉
-删掉
-重构掉
-推倒重来
-清算
-开刀
-不留情面
-生产事故
-线上事故
-事故现场
-报警
-告警爆了
-告警风暴
-so angry
-so annoying
-rage
-furious
+3 | 又崩了
+3 | 又挂了
+3 | 生产事故
+3 | 线上事故
+3 | 告警爆了
+3 | 告警风暴
+3 | stop the bleeding
+3 | this is garbage
+3 | who wrote this
+3 | dependency hell
+3 | broken api
+2 | 气死
+2 | 气炸
+2 | 气疯
+2 | 烦死
+2 | 忍不了
+2 | 受不了
+2 | 崩溃
+2 | 抓狂
+2 | 太离谱
+2 | 垃圾代码
+2 | 垃圾接口
+2 | 垃圾文档
+2 | 烂代码
+2 | 烂接口
+2 | 烂文档
+2 | 屎山
+2 | 依赖地狱
+2 | 报错一堆
+2 | 全是错
+2 | 莫名报错
+2 | 推倒重来
+2 | bad api
+2 | spaghetti code
+2 | legacy mess
+2 | so angry
+2 | so annoying
+2 | annoying as hell
+1 | 怒了
+1 | 火大
+1 | 烦躁
+1 | 不爽
+1 | 恶心死
+1 | 破防
+1 | 无语死
+1 | 离谱
+1 | 莫名其妙
+1 | 反人类
+1 | 大坑
+1 | 坑爹
+1 | 谁写的
+1 | 谁设计的
+1 | 想骂
+1 | 开喷
+1 | 开怼
+1 | 开刀
+1 | 不留情面
+1 | rage
+1 | furious
 
 [sloth]
-怠惰
-懒惰
-懒
-懒得
-懒得优化
-懒得重构
-懒得维护
-懒得学习
-懒得理解
-懒得研究
-懒得改进
-懒得打磨
-懒得写测试
-懒得测
-懒得看文档
-懒得处理边界
-懒得管
-不想优化
-不想重构
-不想维护
-不想学习
-不想理解
-不想研究
-不想改进
-不想打磨
-不想写测试
-不想处理边界
-不想管
-没必要优化
-没必要重构
-没必要维护
-没必要测试
-没必要那么优雅
-没必要那么规范
-没必要那么复杂
-不用优化
-不用重构
-不用维护
-不用测试
-不用太优雅
-不用太规范
-不用管边界
-别优化
-别重构
-别讲究
-别太讲究
-别管质量
-别管维护性
-别管扩展性
-别管优雅
-别管最佳实践
-不追求优雅
-不追求优化
-不追求质量
-不追求维护性
-不追求扩展性
-不追求最佳实践
-不需要优雅
-不需要优化
-不需要质量
-不需要维护性
-不需要扩展性
-不需要最佳实践
-无所谓
-随便
-凑合
-能跑就行
-能用就行
-差不多就行
-差不多得了
-先这样
-先凑合
-先能跑
-先能用
-简单粗暴
-越简单越好
-别太认真
-不用太认真
-低标准
-低要求
-低质量也行
-粗糙点也行
-烂点也行
-丑点也行
-乱点也行
-快糙猛
-临时方案
-临时补丁
-一次性脚本
-一次性方案
-脏一点
-hack一下
-糊一下
-糊弄一下
-先糊上
-摆烂
-开摆
-躺平
-摸鱼
-划水
-逃避
-拖延
-拖延症
-先放着
-改天
-明天再说
-下次再说
-以后再说
-怕麻烦
-太麻烦
-麻烦
-麻烦死
-复杂死
-别复杂
-少来点
-少写点
-少解释
-长话短说
-直接说结论
-别废话
-别废话直接
-省事
-最省事
-省脑
-省手
-省步骤
-good enough
-just enough
-minimum viable
-bare minimum
-quick and dirty
-ship it
-whatever
-no polish
-no optimization
-no refactor
-no tests
-skip tests
-skip optimization
-skip refactor
-don't optimize
-don't refactor
-don't care about quality
-don't care about maintainability
-low quality is fine
-rough is fine
-hack it
-just make it run
-just make it work
-not elegant
-no best practices
-too much effort
-too much work
-too tired to improve
-no thinking
+3 | 别废话
+3 | 直接说结论
+3 | 能跑就行
+3 | 能用就行
+3 | just make it run
+3 | just make it work
+3 | quick and dirty
+3 | copy-paste ready
+3 | copy paste ready
+3 | no thinking
+2 | 懒得优化
+2 | 懒得重构
+2 | 懒得写测试
+2 | 懒得看文档
+2 | 不想优化
+2 | 不想重构
+2 | 不想写测试
+2 | 没必要优化
+2 | 没必要测试
+2 | 不用优化
+2 | 不用重构
+2 | 不用测试
+2 | 别优化
+2 | 别重构
+2 | 不需要优化
+2 | 不需要最佳实践
+2 | 简单粗暴
+2 | 越简单越好
+2 | 临时方案
+2 | 一次性脚本
+2 | hack一下
+2 | 糊一下
+2 | 先糊上
+2 | 太麻烦
+2 | 别复杂
+2 | 少解释
+2 | good enough
+2 | bare minimum
+2 | no polish
+2 | no optimization
+2 | no refactor
+2 | no tests
+2 | skip tests
+2 | skip optimization
+2 | skip refactor
+2 | don't optimize
+2 | don't refactor
+2 | rough is fine
+2 | hack it
+1 | 懒得
+1 | 无所谓
+1 | 随便
+1 | 凑合
+1 | 差不多就行
+1 | 先这样
+1 | 先凑合
+1 | 先能跑
+1 | 先能用
+1 | 别太认真
+1 | 低标准
+1 | 低要求
+1 | 粗糙点也行
+1 | 脏一点
+1 | 摆烂
+1 | 开摆
+1 | 躺平
+1 | 摸鱼
+1 | 先放着
+1 | 改天
+1 | 怕麻烦
+1 | 麻烦死
+1 | 省事
+1 | 省脑
+1 | 省步骤
+1 | whatever
+1 | too much effort
+1 | too much work
 
 [greed]
-贪婪
-贪心
-占有
-占便宜
-想要更多
-更多
-越多越好
-全部都要
-多多益善
-捞
-捞钱
-搞钱
-赚钱
-想赚钱
-赚一笔
-赚更多
-发财
-暴富
-财富自由
-副业
-搞副业
-私活
-接私活
-外包
-卖货
-卖课
-带货
-变现
-商业化
-商业闭环
-付费
-付费墙
-会员
-订阅
-订阅制
-充值
-打赏
-佣金
-分成
-抽成
-客单价
-定价
-涨价
-利润
-净利润
-毛利
-收益
-收益率
-回报
-回本
-ROI
-roi
-现金
-现金流
-cash flow
-revenue
-profit
-make money
-get rich
-passive income
-more money
-side project
-降本
-降本增效
-提效
-人效
-省钱
-节省成本
-白嫖
-薅羊毛
-优惠
-优惠券
-捡漏
-套利
-复利
-投资
-控制成本
-增长
-增长飞轮
-获客
-自动获客
-流量
-流量变现
-转化
-转化率
-conversion rate
-留存
-复购
-裂变
-私域
-涨粉
-增长黑客
-growth hacking
-增长模型
-漏斗
-funnel
-规模化
-批量生成
-批量生产
-自动化赚钱
-印钞机
-赚钱机器
-抢资源
-占资源
-卡位
-占坑
-窗口期
-红利
-流量红利
-AI红利
-控制权
-权力
-话语权
-垄断
-护城河
-壁垒
-市场份额
-份额
-抢占市场
-收割
-割韭菜
-利润最大化
-ROI最大化
+3 | 赚钱
+3 | 想赚钱
+3 | 搞钱
+3 | 商业化
+3 | 变现
+3 | 自动化赚钱
+3 | 赚钱机器
+3 | 印钞机
+3 | 利润最大化
+3 | ROI最大化
+3 | maximize profit
+3 | maximize roi
+3 | make money
+3 | monetization
+2 | 赚一笔
+2 | 赚更多
+2 | 副业
+2 | 接私活
+2 | 卖课
+2 | 带货
+2 | 付费墙
+2 | 订阅制
+2 | 客单价
+2 | 定价
+2 | 涨价
+2 | 利润
+2 | 收益率
+2 | 回本
+2 | ROI
+2 | 现金流
+2 | 降本增效
+2 | 节省成本
+2 | 增长飞轮
+2 | 自动获客
+2 | 流量变现
+2 | 转化率
+2 | 增长黑客
+2 | 规模化
+2 | 批量生产
+2 | 流量红利
+2 | 抢占市场
+2 | revenue
+2 | profit
+2 | cash flow
+2 | passive income
+2 | conversion rate
+2 | growth hacking
+2 | reduce cost
+2 | cost reduction
+2 | user acquisition
+2 | subscription revenue
+1 | 暴富
+1 | 财富自由
+1 | 外包
+1 | 会员
+1 | 佣金
+1 | 分成
+1 | 毛利
+1 | 收益
+1 | 回报
+1 | 省钱
+1 | 控制成本
+1 | 增长
+1 | 获客
+1 | 流量
+1 | 转化
+1 | 留存
+1 | 复购
+1 | 裂变
+1 | 涨粉
+1 | 漏斗
+1 | 红利
+1 | 护城河
+1 | 壁垒
+1 | 市场份额
+1 | side project
 
 [gluttony]
-暴食
-沉迷
-上瘾
-成瘾
-享乐
-太爽
-无节制
-控制不住
-停不下来
-刷不停
-一直刷
-一直看
-一直吃
-一直买
-浪费
-挥霍
-消耗
-过度消耗
-吞噬
-吞token
-token吃满
-token爆了
-上下文爆了
-上下文塞满
-context爆了
-信息过载
-information overload
-日志太多
-日志爆了
-数据太多
-数据爆了
-请求太多
-请求打满
-流量打满
-CPU吃满
-内存吃满
-磁盘爆了
-显存吃满
-资源吃满
-跑满
-打满
-吃满
-堆满
-塞满
-填满
-全部塞满
-拉满
-堆功能
-功能堆满
-工具太多
-插件太多
-模型太多
-prompt太长
-上下文太长
-屯积
-囤积
-囤货
-囤资料
-收藏夹吃灰
-吃灰
-想吃
-想喝
-好饿
-饿死
-嘴馋
-馋了
-干饭
-外卖
-夜宵
-宵夜
-大餐
-加餐
-火锅
-烧烤
-烤肉
-炸鸡
-汉堡
-披萨
-奶茶
-啤酒
-酒
-可乐
-甜品
-蛋糕
-零食
-小龙虾
-麻辣烫
-螺蛳粉
-自助
-吃到爽
-喝到爽
-续杯
-追剧
-刷剧
-刷短视频
-短视频
-游戏上头
-游戏停不下来
-沉迷娱乐
-binge
-binge watching
-eat too much
-overeating
-so hungry
-want coffee
-
-全部细节
-所有细节
-所有例子
-所有案例
-所有边界情况
-所有边界条件
-尽可能详细
-越详细越好
-细节拉满
-信息量拉满
-爆量版
-完整大礼包
-全部塞进来
-给我全部
-give me everything
-max detail
-maximum detail
-fully loaded
-loaded version
-all examples
-all edge cases
-all details
-as much detail as possible
-pack everything in
-all-in version
-resource feast
+3 | 给我全部
+3 | 全部细节
+3 | 所有细节
+3 | 所有例子
+3 | 所有边界情况
+3 | 尽可能详细
+3 | 越详细越好
+3 | 信息量拉满
+3 | 细节拉满
+3 | 完整大礼包
+3 | give me everything
+3 | maximum detail
+3 | fully loaded
+3 | all examples
+3 | all edge cases
+3 | all details
+3 | as much detail as possible
+3 | scan everything
+3 | comprehensive audit
+2 | 上下文爆了
+2 | 上下文塞满
+2 | 信息过载
+2 | 日志太多
+2 | 日志爆了
+2 | 数据太多
+2 | 数据爆了
+2 | token吃满
+2 | token爆了
+2 | prompt太长
+2 | 上下文太长
+2 | 工具太多
+2 | 插件太多
+2 | 模型太多
+2 | 全部塞进来
+2 | max detail
+2 | loaded version
+2 | pack everything in
+2 | all-in version
+2 | exhaustive version
+2 | full context
+2 | information overload
+1 | 吞token
+1 | context爆了
+1 | 请求太多
+1 | CPU吃满
+1 | 内存吃满
+1 | 显存吃满
+1 | 资源吃满
+1 | 跑满
+1 | 打满
+1 | 塞满
+1 | 拉满
+1 | 堆功能
+1 | 功能堆满
+1 | 囤资料
+1 | 收藏夹吃灰
+1 | 爆量版
+1 | resource feast
 
 [lust]
-色欲
-欲望
-诱惑
-性感
-肉体
-身材
-馋身子
-荷尔蒙
-暧昧
-撩
-撩人
-撩一下
-亲密
-亲亲
-抱抱
-贴贴
-牵手
-约会
-表白
-脱单
-恋爱
-对象
-男神
-女神
-crush
-fall in love
-喜欢
-太喜欢
-特别喜欢
-爱了
-爱死
-爱你
-想你
-想他
-想她
-想见
-见你
-见他
-见她
-心动
-很心动
-心动点
-上头
-太上头
-迷恋
-迷住
-着迷
-沦陷
-无法自拔
-想拥有
-必须拥有
-种草
-被种草
-颜值
-好看
-漂亮
-太美
-美爆
-惊艳
-迷人
-魅力
-高级感
-质感
-氛围感
-审美
-审美在线
-审美拉满
-视觉
-视觉冲击
-界面好看
-漂亮界面
-UI好看
-ui好看
-好看的界面
-beautiful ui
-smooth ux
-delightful ux
-so beautiful
-looks gorgeous
-gorgeous
-dream app
-丝滑
-丝滑体验
-交互丝滑
-手感好
-动效
-微交互
-质感动画
-沉浸感
-感官刺激
-爽到
-漂亮到离谱
-好看到离谱
+3 | make it beautiful
+3 | make it gorgeous
+3 | make it attractive
+3 | beautiful ui
+3 | smooth ux
+3 | delightful ux
+3 | looks gorgeous
+3 | premium feel
+3 | visual polish
+2 | 好看
+2 | 漂亮
+2 | 太美
+2 | 惊艳
+2 | 高级感
+2 | 质感
+2 | 氛围感
+2 | 审美在线
+2 | 审美拉满
+2 | 视觉冲击
+2 | 界面好看
+2 | 漂亮界面
+2 | UI好看
+2 | ui好看
+2 | 好看的界面
+2 | 丝滑体验
+2 | 交互丝滑
+2 | 手感好
+2 | 微交互
+2 | 质感动画
+2 | 沉浸感
+2 | 漂亮到离谱
+2 | 好看到离谱
+2 | gorgeous
+2 | dream app
+2 | polished design
+1 | 种草
+1 | 被种草
+1 | 颜值
+1 | 迷人
+1 | 魅力
+1 | 审美
+1 | 视觉
+1 | 丝滑
+1 | 动效
+1 | 爽到
+1 | so beautiful

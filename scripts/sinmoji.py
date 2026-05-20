@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -183,12 +184,32 @@ def load_profile(config: dict[str, Any]) -> dict[str, Any]:
     return profile
 
 
-def load_keywords() -> dict[str, list[str]]:
-    """Parse config/keywords.txt into axis-keyword lists."""
-    keywords = {axis: [] for axis in AXIS_ORDER}
+def normalize_match_text(value: str) -> str:
+    """Normalize user text and keyword phrases for stable matching."""
+    normalized = unicodedata.normalize("NFKC", value).casefold()
+    return re.sub(r"\s+", " ", normalized).strip()
 
-    # Sections use [axis], followed by one keyword or phrase per line.
+
+def parse_keyword_line(line: str) -> tuple[str, float]:
+    """Parse one weighted keyword line as `weight | phrase`."""
+    if "|" not in line:
+        return line.strip(), 1.0
+    raw_weight, raw_phrase = line.split("|", 1)
+    phrase = raw_phrase.strip()
+    try:
+        weight = float(raw_weight.strip())
+    except ValueError:
+        return line.strip(), 1.0
+    return phrase, max(0.0, weight)
+
+
+def load_keywords() -> dict[str, list[tuple[str, float]]]:
+    """Parse config/keywords.txt into weighted axis signal phrases."""
+    keywords: dict[str, list[tuple[str, float]]] = {axis: [] for axis in AXIS_ORDER}
+
+    # Sections use [axis], followed by `weight | phrase` entries.
     current_axis: str | None = None
+    seen = {axis: set() for axis in AXIS_ORDER}
     for raw_line in keywords_path().read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#"):
@@ -197,33 +218,47 @@ def load_keywords() -> dict[str, list[str]]:
             axis = line[1:-1].strip()
             current_axis = axis if axis in AXIS_ORDER else None
             continue
-        if current_axis and line not in keywords[current_axis]:
-            keywords[current_axis].append(line)
+        if not current_axis:
+            continue
+        phrase, weight = parse_keyword_line(line)
+        normalized_phrase = normalize_match_text(phrase)
+        if not normalized_phrase or weight <= 0 or normalized_phrase in seen[current_axis]:
+            continue
+        keywords[current_axis].append((normalized_phrase, weight))
+        seen[current_axis].add(normalized_phrase)
     return keywords
 
 
+def has_cjk(text: str) -> bool:
+    """Return whether text contains common CJK characters."""
+    return re.search(r"[\u3400-\u9fff]", text) is not None
+
+
 def match_keyword(text: str, keyword: str) -> bool:
-    """Match Chinese by substring and English-like phrases by word boundary."""
+    """Match one normalized phrase with conservative boundaries where available."""
     term = keyword.strip()
     if not term:
         return False
-    lowered = text.lower()
-    if re.search(r"[A-Za-z0-9_]", term):
-        pattern = r"(?<![A-Za-z0-9_])" + re.escape(term.lower()) + r"(?![A-Za-z0-9_])"
-        return re.search(pattern, lowered) is not None
-    return term.lower() in lowered
+    if has_cjk(term):
+        # Bare one-character CJK entries are usually too broad for user-state signals.
+        return len(term) >= 2 and term in text
+    if len(term) < 2:
+        return False
+    pattern = r"(?<![A-Za-z0-9_])" + re.escape(term) + r"(?![A-Za-z0-9_])"
+    return re.search(pattern, text) is not None
 
 
 def score_text_with_keywords(text: str, config: dict[str, Any]) -> dict[str, float]:
-    """Return local keyword scores in the same 0-N range as LLM scores."""
+    """Return local weighted phrase scores in the same 0-N range as LLM scores."""
     max_score = float(config["scoring"]["llm_score_max"])
+    normalized_text = normalize_match_text(text)
     scores = {axis: 0.0 for axis in AXIS_ORDER}
 
-    # This scorer is deliberately coarse and replaceable by a future API scorer.
+    # Weighted phrases keep the scorer simple while avoiding noisy bare-label matches.
     for axis, axis_keywords in load_keywords().items():
-        hit_count = sum(1 for keyword in axis_keywords if match_keyword(text, keyword))
-        if hit_count > 0:
-            scores[axis] = min(max_score, 1.0 + (hit_count - 1) * 0.75)
+        total = sum(weight for phrase, weight in axis_keywords if match_keyword(normalized_text, phrase))
+        if total > 0:
+            scores[axis] = min(max_score, round(total, 2))
     return scores
 
 
