@@ -5,19 +5,33 @@
 <h1 align="center">Sinmoji</h1>
 
 <p align="center">
-  <strong>让 AI 在回答前，先读懂用户真正想要什么。</strong><br />
-  它会捕捉一句话里的情绪、压力、审美和行动偏好，再给出更贴合当下状态的回答风格。
+  <strong>让 AI 在回答前多读一层用户状态</strong><br />
+  一个本地运行的 pre-answer Agent Skill，把用户消息里的情绪、压力、审美和行动偏好转成回答风格提示
 </p>
 
 <p align="center">
-  <code>pre-answer analysis</code> · <code>seven localized sins</code> · <code>local profile</code> · <code>style prompt</code>
+  <code>agent skill</code> · <code>pre-answer analysis</code> · <code>seven localized sins</code> · <code>local profile</code> · <code>style prompt</code>
 </p>
 
 ---
 
-## 为什么需要 Sinmoji？
+## Sinmoji 是什么
 
-用户发来的每句话，都不只是“任务”。它可能同时包含：
+Sinmoji 是给 Codex、Claude Code、OpenCode 等 Agent 环境使用的 **response-style adapter**
+
+它做三件事：
+
+1. 读取当前用户消息
+2. 按七个 Sinmoji 轴打分并更新本地画像
+3. 返回可选的 `[SINMOJI_STYLE]`，让助手调整自然语言表达
+
+它只影响表达方式，不改事实、代码、命令、JSON/YAML/SQL、文件名、测试快照或安全策略
+
+---
+
+## 为什么需要 Sinmoji
+
+用户发来的每句话都不只是“任务”，它可能同时包含：
 
 <table>
 <tr>
@@ -34,17 +48,17 @@
 </tr>
 </table>
 
-普通助手通常只看见问题本身。Sinmoji 会多读一层“状态”：用户此刻是烦躁、懒得折腾、追求高级感、想要增长，还是已经被信息量撑爆了。
+很多时候，任务背后还有一层状态：烦躁、懒得折腾、追求高级感、想要增长，或者已经被信息量撑爆
 
-> Sinmoji 不是为了让 AI 变得夸张，而是让 AI 更会读空气。
+> Sinmoji 不追求夸张，只负责给回答加一点读空气的能力
 
-当状态被识别出来，回答就能更贴近用户真正想要的东西：该直接时直接，该省事时省事，该商业化时商业化，该拿出审美和标准时就别糊弄。
+识别出这些信号后，回答可以更贴近当下场景：该直接时直接，该省事时省事，该商业化时商业化，该拿出审美和标准时就别糊弄
 
 ---
 
 ## 七宗罪式的用户状态模型
 
-这里的“七宗罪”不是宗教概念，而是一组面向中文技术、产品、创作者和 AI 工具场景的行为镜头。
+这里借用“七宗罪”这个文化隐喻，用来描述技术、产品、创作者和 AI 工具场景里的行为信号
 
 | Axis | 状态 | 常见信号 |
 |---|---|---|
@@ -56,7 +70,7 @@
 | `gluttony` | 过载与更多欲望 | 多给点、完整版本、上下文太多、日志爆炸、资源塞满 |
 | `lust` | 审美与吸引力 | 漂亮、丝滑、高级感、好看、想要、体验感 |
 
-每一轴都会被打 `0-5` 分，并累积到本地画像里。随着使用次数增加，Sinmoji 会逐渐知道用户更偏好哪种回答姿态。
+每一轴都会被打 `0-5` 分，并累积到本地画像里。用得越久，Sinmoji 越知道用户偏好哪种回答姿态
 
 ---
 
@@ -76,9 +90,7 @@ Optional [SINMOJI_STYLE]
 Assistant answers with the right tone
 ```
 
-简化成一句话：先判断用户状态，再更新本地画像，最后把可选风格提示交给助手使用。
-
-风格只影响自然语言表达，不改变事实、代码、命令、JSON、文件名或用户指定格式。
+先判断用户状态，再更新本地画像，最后把可选风格提示交给助手使用
 
 ---
 
@@ -103,7 +115,7 @@ python3 scripts/sinmoji.py evaluate \
 ```text
 [SINMOJI_STYLE]
 Primary tone: Wrath / frustration (...)
-Available emoji: 💢 🔧
+Emoji palette: 💢 🔧
 Emoji usage: ...
 [/SINMOJI_STYLE]
 ```
@@ -125,3 +137,15 @@ python3 scripts/sinmoji.py report
 ```bash
 python3 scripts/sinmoji.py reset
 ```
+
+---
+
+## 隐私与安全
+
+- 本地运行，没有网络客户端、遥测、webhook 或外部 API 调用
+- 原始用户消息只用于本地即时评分，不写入画像或事件日志
+- 运行状态只保存聚合分数、等级、时间戳和紧凑 delta
+- Sinmoji 只改变自然语言风格，不改变事实、代码行为、命令、安全策略或机器可读输出
+- 七个轴是风格隐喻，不是心理诊断、人格测试或敏感属性分类
+
+更多细节见 [SAFETY_REVIEW.md](SAFETY_REVIEW.md)
