@@ -5,7 +5,7 @@
     "llm_score_multiplier": 1,
     "keyword_weight": 0.2,
     "decay_factor": 0.997,
-    "secondary_axis_ratio": 0.2,
+    "secondary_axis_ratio": 0.7,
     "level_thresholds": {
       "level_1": 10,
       "level_2": 20,
