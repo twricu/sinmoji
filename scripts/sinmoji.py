@@ -15,6 +15,8 @@ from typing import Any
 MIN_PYTHON_VERSION = (3, 8)
 AXIS_ORDER = ("pride", "envy", "wrath", "sloth", "greed", "gluttony", "lust")
 BAR_WIDTH = 20
+# Maximum original user-input length that is safe for preference scoring.
+MAX_QUESTION_LENGTH = 200
 DEFAULT_PROFILE_JSON = r"""
 {
   "created_at": "__NOW__",
@@ -398,6 +400,9 @@ def append_profile_log(entry: dict[str, Any], config: dict[str, Any]) -> None:
 
 def evaluate(raw_scores: dict[str, Any], question: str, profile: dict[str, Any], config: dict[str, Any]) -> tuple[str, bool, dict[str, Any], dict[str, Any] | None]:
     """Run the one-call pipeline and return prompt, changed flag, profile, and log entry."""
+    if len(question) > MAX_QUESTION_LENGTH:
+        return style_prompt(profile, config), False, profile, None
+
     llm_scores = normalized_llm_scores(raw_scores, config)
     keyword_scores = score_text_with_keywords(question, config)
     deltas = calculate_deltas(llm_scores, keyword_scores, config)
